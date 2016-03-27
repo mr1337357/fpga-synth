@@ -3,14 +3,19 @@ use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
 entity lut is
-   Port( clk : in STD_LOGIC;
+   Port(     
+          clk : in STD_LOGIC;
+          --sample input
+          smp_in : in STD_LOGIC_VECTOR(7 downto 0);
+          smp_val_in : in STD_LOGIC;
+          --sample output
+          smp_out : out STD_LOGIC_VECTOR(7 downto 0);
+          smp_val_out : out STD_LOGIC;
+          --control
           cs : in STD_LOGIC;
-   smp_valid : in STD_LOGIC;
-      smp_in : in STD_LOGIC_VECTOR(7 downto 0);
-     smp_clk : in STD_LOGIC;
-    phase_in : in STD_LOGIC(7 downto 0);
-     smp_out : out STD_LOGIC_VECTOR(7 downto 0);
-   );
+          ctl_val : in STD_LOGIC;
+          ctl_in : in STD_LOGIC_VECTOR(7 downto 0)
+       );
 end lut;
 
 architecture Behavioral of lut is
@@ -29,7 +34,7 @@ begin
          smp_out <= mem(rd_index);
       end if;
    end process;
-   
+
    process(clk)
    begin
       if(clk'event and clk = '1')

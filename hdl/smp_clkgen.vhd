@@ -3,10 +3,14 @@ use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
 entity smp_clkgen is
-   Generic( in_freq : INTEGER := 50000000;
-           out_freq : INTEGER := 65536);
-   Port ( clk : in STD_LOGIC;
-      smp_clk : out STD_LOGIC);
+   Generic( 
+             in_freq : INTEGER := 50000000;
+             out_freq : INTEGER := 65536
+          );
+   Port ( 
+           clk : in STD_LOGIC;
+           smp_clk : out STD_LOGIC
+        );
 end smp_clkgen;
 
 architecture Behavioral of smp_clkgen is
