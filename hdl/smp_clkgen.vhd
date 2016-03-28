@@ -5,7 +5,7 @@ use IEEE.STD_LOGIC_UNSIGNED.ALL;
 entity smp_clkgen is
    Generic( 
              in_freq : INTEGER := 100000000;
-             out_freq : INTEGER := 65536
+             out_freq : INTEGER := 1000000
           );
    Port ( 
            clk : in STD_LOGIC;

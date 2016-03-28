@@ -23,7 +23,7 @@ begin
    begin
       if(clk'event and clk = '1')
       then
-         if(cs = '0')
+         if(cs = '1')
          then
             is_address <= '1';
          else

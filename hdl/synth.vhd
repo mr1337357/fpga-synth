@@ -22,8 +22,8 @@ architecture BEHAVIORAL of synth is
    signal XLXN_10 : std_logic;
    signal XLXN_11 : std_logic;
    signal XLXN_12 : std_logic_vector (7 downto 0);
-   signal XLXN_16 : std_logic_vector (7 downto 0);
-   signal XLXN_17 : std_logic;
+   signal data : std_logic_vector (7 downto 0);
+   signal valid : std_logic;
    component addr_decode
       port ( clk   : in    std_logic; 
              cs    : in    std_logic; 
@@ -89,8 +89,8 @@ begin
    XLXI_1 : addr_decode
       port map (clk=>clk,
                 cs=>cs,
-                data(7 downto 0)=>XLXN_16(7 downto 0),
-                valid=>XLXN_17,
+                data(7 downto 0)=>data(7 downto 0),
+                valid=>valid,
                 sel(7 downto 0)=>sel(7 downto 0));
    
    XLXI_2 : spi_slave
@@ -98,14 +98,14 @@ begin
                 cs=>cs,
                 sck=>sck,
                 sdi=>sdi,
-                data(7 downto 0)=>XLXN_16(7 downto 0),
-                wr=>XLXN_17);
+                data(7 downto 0)=>data(7 downto 0),
+                wr=>valid);
    
    XLXI_3 : lut
       port map (clk=>clk,
                 cs=>sel(1),
-                ctl_in(7 downto 0)=>XLXN_16(7 downto 0),
-                ctl_val=>XLXN_17,
+                ctl_in(7 downto 0)=>data(7 downto 0),
+                ctl_val=>valid,
                 smp_in(7 downto 0)=>XLXN_6(7 downto 0),
                 smp_val_in=>XLXN_7,
                 smp_out(7 downto 0)=>XLXN_9(7 downto 0),
@@ -124,8 +124,8 @@ begin
    XLXI_7 : volctl
       port map (clk=>clk,
                 cs=>sel(2),
-                ctl_in(7 downto 0)=>XLXN_16(7 downto 0),
-                ctl_val=>XLXN_17,
+                ctl_in(7 downto 0)=>data(7 downto 0),
+                ctl_val=>valid,
                 smp_in(7 downto 0)=>XLXN_9(7 downto 0),
                 smp_val_in=>XLXN_10,
                 smp_out(7 downto 0)=>XLXN_12(7 downto 0),
@@ -134,8 +134,8 @@ begin
    XLXI_8 : phase_acc
       port map (clk=>clk,
                 cs=>sel(0),
-                ctl_in(7 downto 0)=>XLXN_16(7 downto 0),
-                ctl_val=>XLXN_17,
+                ctl_in(7 downto 0)=>data(7 downto 0),
+                ctl_val=>valid,
                 smp_val_in=>XLXN_4,
                 smp_out(7 downto 0)=>XLXN_6(7 downto 0),
                 smp_val_out=>XLXN_7);
