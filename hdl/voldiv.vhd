@@ -34,7 +34,7 @@ begin
          then
             if(ctl_val = '1')
             then
-               amp <= ctl_in;
+               amp <= ctl_in(3 downto 0);
             end if;
          end if;
       end if;

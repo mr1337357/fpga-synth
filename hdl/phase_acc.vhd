@@ -50,7 +50,7 @@ begin
                freq_state <= '1';
                freq_temp <= ctl_in;
             end if;
-            if(in_wr = '1' and freq_state = '1')
+            if(ctl_val = '1' and freq_state = '1')
             then
                int_freq <=freq_temp & ctl_in;
             end if;

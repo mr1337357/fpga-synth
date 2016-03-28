@@ -12,8 +12,8 @@ Port (
         smp_in : in STD_LOGIC_VECTOR (7 downto 0);
         smp_val_in : in STD_LOGIC;
         -- misc
-        wave_out : out STD_LOGIC;
-);
+        wave_out : out STD_LOGIC
+     );
 end pwm;
 
 architecture Behavioral of pwm is
