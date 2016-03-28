@@ -23,7 +23,7 @@ architecture Behavioral of phase_acc is
    Signal freq_state : STD_LOGIC := '0';
    Signal freq_temp : STD_LOGIC_VECTOR(7 downto 0) := "00000000";
 begin
-   smp_out <= int_phase(15 downto 8);
+   phase_out <= int_phase(15 downto 8);
 
    process(clk)
    begin
@@ -32,9 +32,6 @@ begin
          if(smp_val_in = '1')
          then
             int_phase <= int_phase + int_freq;
-            smp_val_out <= '1';
-         else
-            smp_val_out <= '0';
          end if;
       end if;
    end process;

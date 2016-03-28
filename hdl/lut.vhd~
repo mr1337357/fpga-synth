@@ -34,9 +34,6 @@ begin
          if(smp_val_in = '1')
          then
             smp_out <= mem(rd_index);
-            smp_val_out <= '1';
-         else
-            smp_val_out <= '0';
          end if;
       end if;
    end process;
