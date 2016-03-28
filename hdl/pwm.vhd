@@ -4,7 +4,7 @@ use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
 entity pwm is
    Generic ( 
-   clkdiv : INTEGER
+   clkdiv : INTEGER := 255
 );
 Port (
         clk : in STD_LOGIC;
