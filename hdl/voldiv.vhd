@@ -20,11 +20,14 @@ entity volctl is
 end volctl;
 
 architecture Behavioral of volctl is
-   Signal amp : STD_LOGIC_VECTOR(4 downto 0) := "01000";
-   Signal mul : STD_LOGIC_VECTOR(12 downto 0);
+   Signal smp_sgn : STD_LOGIC_VECTOR(7 downto 0);
+   Signal amp : STD_LOGIC_VECTOR(5 downto 0) := "000100";
+   Signal mul : STD_LOGIC_VECTOR(13 downto 0);
+   Signal output : STD_LOGIC_VECTOR(7 downto 0);
 begin
-
-   mul <= smp_in & amp;
+   smp_sgn <=(not smp_in(7)) & smp_in(6 downto 0);
+   mul <= std_logic_vector(signed(smp_sgn)*signed(amp));
+   output <= (mul(11)) & mul(10 downto 4);
 
    process(clk)
    begin
@@ -34,7 +37,7 @@ begin
          then
             if(ctl_val = '1')
             then
-               amp <= ctl_in(4 downto 0);
+               amp <= '0' & ctl_in(4 downto 0);
             end if;
          end if;
       end if;
@@ -46,7 +49,7 @@ begin
       then
          if(smp_val_in = '1')
          then
-            smp_out <= mul(11 downto 4);
+            smp_out <= output;
             smp_val_out <= '1';
          else
             smp_val_out <= '0';
