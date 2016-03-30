@@ -54,5 +54,7 @@ def chartable(func,start,end,name):
 if __name__ == '__main__':
   from math import sin
   ramp = lambda x: float(x-128)/128
+  square = lambda x: 1 if x>128 else -1
   print(chartable(sin,0,6.28,'sine'))
   print(chartable(ramp,0,256,'ramp'))
+  print(chartable(square,0,256,'square'))

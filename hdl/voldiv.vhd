@@ -20,14 +20,29 @@ entity volctl is
 end volctl;
 
 architecture Behavioral of volctl is
+
+component mult is
+   Port (
+            a : in STD_LOGIC_VECTOR(7 downto 0);
+            b : in STD_LOGIC_VECTOR(4 downto 0);
+            o : out STD_LOGIC_VECTOR(7 downto 0)
+        );
+end component;
+
    Signal smp_sgn : STD_LOGIC_VECTOR(7 downto 0);
-   Signal amp : STD_LOGIC_VECTOR(5 downto 0) := "000100";
-   Signal mul : STD_LOGIC_VECTOR(13 downto 0);
+   Signal amp : STD_LOGIC_VECTOR(4 downto 0) := "00100";
+   Signal mul : STD_LOGIC_VECTOR(7 downto 0);
    Signal output : STD_LOGIC_VECTOR(7 downto 0);
+
 begin
    smp_sgn <=(not smp_in(7)) & smp_in(6 downto 0);
-   mul <= std_logic_vector(signed(smp_sgn)*signed(amp));
-   output <= (mul(11)) & mul(10 downto 4);
+   m1 : mult
+    port map (
+        a => smp_sgn,
+        b => amp,
+        o => mul
+        );
+   output <= (not mul(7)) & mul(6 downto 0);
 
    process(clk)
    begin
@@ -37,7 +52,7 @@ begin
          then
             if(ctl_val = '1')
             then
-               amp <= '0' & ctl_in(4 downto 0);
+               amp <= ctl_in(4 downto 0);
             end if;
          end if;
       end if;
