@@ -21,7 +21,7 @@ Signals:
 Protocol:
 ---------
 This synthesizer uses standard SPI unidirectional data communication. There currently is no provision for the FPGA to report data back to the host processor.
-Packets take the form of /CS,addr,data,CS. This means that a transaction begins with the processor bringing CS low, then transmitting a one byte address to pick a sub-block of the design, followed by data to be transmitted to said block.
+Packets take the form of /CS,addr,data,CS. This means that a transaction begins with the processor bringing CS low, then transmitting a one byte address to pick a sub-block of the design, followed by data to be transmitted to said block. The transaction ends when CS goes back to high.
 The FPGA will assume that sdi is valid only on falling edges of sck.
 
 Addresses:
