@@ -30,3 +30,22 @@ Addresses:
 * 1. Look Up Table - This is the memory to store the wave. Waves take the form of offset binary signed bytes. There are 256 samples per wave, each 8 bits wide. Offset binary simply means it is a signed number with the most significant bit inverted. 
 * 2. Volume/Envelope - This sets the volume for the signal to be played. Currently it is a linear function, although I'd like to change this to a scaled logarithmic curve. It takes a one byte unsigned number but it only uses the 5 least significant bits.
 * 3. LEDs - This register isn't necessary. It is just a 16 bit register that shows its stored value on a bank of LEDs.
+
+SPI TIMING
+----------
+```
+       +----------------------------------------------------------------------------+
+       |                                                                            |
+CS     | +--+                                                                  +--+ |
+       |    |                                                                  |    |
+       |    +------------------------------------------------------------------+    |
+SCK    | +------+   +---+   +---+   +---+   +---+   +---+   +---+   +---+   +-----+ |
+       |        |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |       |
+       |        +---+   +---+   +---+   +---+   +---+   +---+   +---+   +---+       |
+SDI    | +--+                                               +-------+       +-----+ |
+       |    |                                               |       |       |       |
+       |    +-----------------------------------------------+       +-------+       |
+       |                                                                            |
+       +----------------------------------------------------------------------------+
+BITS            0       0       0       0       0       0       1       0      =0x02
+```
