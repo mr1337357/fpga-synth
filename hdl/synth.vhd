@@ -1,4 +1,3 @@
---generated from ISE Schematic tool
 library ieee;
 use ieee.std_logic_1164.ALL;
 use ieee.numeric_std.ALL;
@@ -10,38 +9,49 @@ entity synth is
           cs    : in    std_logic; 
           sck   : in    std_logic; 
           sdi   : in    std_logic; 
-          l_out : out   std_logic;
-          led  : out   std_logic_vector(15 downto 0)
-         );
+          l_out : out   std_logic; 
+          r_out : out   std_logic);
 end synth;
 
 architecture BEHAVIORAL of synth is
-   signal sel     : std_logic_vector (7 downto 0);
-   signal XLXN_4  : std_logic;
-   signal phase  : std_logic_vector (7 downto 0);
-   signal XLXN_7  : std_logic;
-   signal wave  : std_logic_vector (7 downto 0);
-   signal XLXN_10 : std_logic;
-   signal XLXN_11 : std_logic;
-   signal post_amp : std_logic_vector (7 downto 0);
-   signal data : std_logic_vector (7 downto 0);
-   signal valid : std_logic;
-   
+   signal chan_val_1  : std_logic;
+   signal chan_val_2  : std_logic;
+   signal chan_val_3  : std_logic;
+   signal chan_val_4  : std_logic;
+   signal chan_1      : std_logic_vector (7 downto 0);
+   signal chan_2      : std_logic_vector (7 downto 0);
+   signal chan_3      : std_logic_vector (7 downto 0);
+   signal chan_4      : std_logic_vector (7 downto 0);
+   signal data        : std_logic_vector (7 downto 0);
+   signal l_dat       : std_logic_vector (7 downto 0);
+   signal l_val       : std_logic;
+   signal phase_dat_1 : std_logic_vector (7 downto 0);
+   signal phase_dat_2 : std_logic_vector (7 downto 0);
+   signal phase_dat_3 : std_logic_vector (7 downto 0);
+   signal phase_dat_4 : std_logic_vector (7 downto 0);
+   signal phs_val_1   : std_logic;
+   signal phs_val_2   : std_logic;
+   signal phs_val_3   : std_logic;
+   signal phs_val_4   : std_logic;
+   signal r_dat       : std_logic_vector (7 downto 0);
+   signal r_val       : std_logic;
+   signal sel         : std_logic_vector (15 downto 0);
+   signal smp_clk     : std_logic;
+   signal valid       : std_logic;
+   signal wave_val_1  : std_logic;
+   signal wave_val_2  : std_logic;
+   signal wave_val_3  : std_logic;
+   signal wave_val_4  : std_logic;
+   signal wave_1      : std_logic_vector (7 downto 0);
+   signal wave_2      : std_logic_vector (7 downto 0);
+   signal wave_3      : std_logic_vector (7 downto 0);
+   signal wave_4      : std_logic_vector (7 downto 0);
    component addr_decode
       port ( clk   : in    std_logic; 
              cs    : in    std_logic; 
              valid : in    std_logic; 
              data  : in    std_logic_vector (7 downto 0); 
-             sel   : out   std_logic_vector (7 downto 0));
-   end component;
-   
-   component spi_slave
-      port ( clk  : in    std_logic; 
-             sck  : in    std_logic; 
-             sdi  : in    std_logic; 
-             cs   : in    std_logic; 
-             wr   : out   std_logic; 
-             data : out   std_logic_vector (7 downto 0));
+             sel   : out   std_logic_vector (15 downto 0));
    end component;
    
    component lut
@@ -55,11 +65,43 @@ architecture BEHAVIORAL of synth is
              smp_out     : out   std_logic_vector (7 downto 0));
    end component;
    
+   component mixer
+      port ( clk          : in    std_logic; 
+             smp_val_in_1 : in    std_logic; 
+             smp_val_in_2 : in    std_logic; 
+             smp_val_in_3 : in    std_logic; 
+             smp_clk      : in    std_logic; 
+             smp_in_1     : in    std_logic_vector (7 downto 0); 
+             smp_in_2     : in    std_logic_vector (7 downto 0); 
+             smp_in_3     : in    std_logic_vector (7 downto 0); 
+             smp_val_out  : out   std_logic; 
+             smp_out      : out   std_logic_vector (7 downto 0));
+   end component;
+   
    component pwm
       port ( clk        : in    std_logic; 
              smp_val_in : in    std_logic; 
              smp_in     : in    std_logic_vector (7 downto 0); 
              wave_out   : out   std_logic);
+   end component;
+   
+   component phase_acc
+      port ( clk         : in    std_logic; 
+             smp_val_in  : in    std_logic; 
+             cs          : in    std_logic; 
+             ctl_val     : in    std_logic; 
+             ctl_in      : in    std_logic_vector (7 downto 0); 
+             smp_val_out : out   std_logic; 
+             smp_out     : out   std_logic_vector (7 downto 0));
+   end component;
+   
+   component spi_slave
+      port ( clk  : in    std_logic; 
+             sck  : in    std_logic; 
+             sdi  : in    std_logic; 
+             cs   : in    std_logic; 
+             wr   : out   std_logic; 
+             data : out   std_logic_vector (7 downto 0));
    end component;
    
    component smp_clkgen
@@ -78,36 +120,127 @@ architecture BEHAVIORAL of synth is
              smp_out     : out   std_logic_vector (7 downto 0));
    end component;
    
-   component phase_acc
-      port ( clk         : in    std_logic; 
-             smp_val_in  : in    std_logic; 
-             cs          : in    std_logic; 
-             ctl_val     : in    std_logic; 
-             ctl_in      : in    std_logic_vector (7 downto 0); 
-             smp_val_out : out   std_logic; 
-             smp_out     : out   std_logic_vector (7 downto 0));
-   end component;
-   
-   component leds
-      port (
-           clk : in STD_LOGIC;
-           --control
-           cs : in STD_LOGIC;
-           ctl_val : in STD_LOGIC;
-           ctl_in : in STD_LOGIC_VECTOR(7 downto 0);
-		   --misc
-		   leds : out STD_LOGIC_VECTOR(15 downto 0));
-   end component;
-   
 begin
-   XLXI_1 : addr_decode
+   decoder : addr_decode
       port map (clk=>clk,
                 cs=>cs,
                 data(7 downto 0)=>data(7 downto 0),
                 valid=>valid,
-                sel(7 downto 0)=>sel(7 downto 0));
+                sel(15 downto 0)=>sel(15 downto 0));
    
-   XLXI_2 : spi_slave
+   lut_1 : lut
+      port map (clk=>clk,
+                cs=>sel(4),
+                ctl_in(7 downto 0)=>data(7 downto 0),
+                ctl_val=>valid,
+                smp_in(7 downto 0)=>phase_dat_1(7 downto 0),
+                smp_val_in=>phs_val_1,
+                smp_out(7 downto 0)=>wave_1(7 downto 0),
+                smp_val_out=>wave_val_1);
+   
+   lut_2 : lut
+      port map (clk=>clk,
+                cs=>sel(5),
+                ctl_in(7 downto 0)=>data(7 downto 0),
+                ctl_val=>valid,
+                smp_in(7 downto 0)=>phase_dat_2(7 downto 0),
+                smp_val_in=>phs_val_2,
+                smp_out(7 downto 0)=>wave_2(7 downto 0),
+                smp_val_out=>wave_val_2);
+   
+   lut_3 : lut
+      port map (clk=>clk,
+                cs=>sel(6),
+                ctl_in(7 downto 0)=>data(7 downto 0),
+                ctl_val=>valid,
+                smp_in(7 downto 0)=>phase_dat_3(7 downto 0),
+                smp_val_in=>phs_val_3,
+                smp_out(7 downto 0)=>wave_3(7 downto 0),
+                smp_val_out=>wave_val_3);
+   
+   lut_4 : lut
+      port map (clk=>clk,
+                cs=>sel(7),
+                ctl_in(7 downto 0)=>data(7 downto 0),
+                ctl_val=>valid,
+                smp_in(7 downto 0)=>phase_dat_4(7 downto 0),
+                smp_val_in=>phs_val_4,
+                smp_out(7 downto 0)=>wave_4(7 downto 0),
+                smp_val_out=>wave_val_4);
+   
+   l_mix : mixer
+      port map (clk=>clk,
+                smp_clk=>smp_clk,
+                smp_in_1(7 downto 0)=>chan_1(7 downto 0),
+                smp_in_2(7 downto 0)=>chan_2(7 downto 0),
+                smp_in_3(7 downto 0)=>chan_3(7 downto 0),
+                smp_val_in_1=>chan_val_1,
+                smp_val_in_2=>chan_val_2,
+                smp_val_in_3=>chan_val_3,
+                smp_out(7 downto 0)=>l_dat(7 downto 0),
+                smp_val_out=>l_val);
+   
+   l_pwm : pwm
+      port map (clk=>clk,
+                smp_in(7 downto 0)=>l_dat(7 downto 0),
+                smp_val_in=>l_val,
+                wave_out=>l_out);
+   
+   phase_1 : phase_acc
+      port map (clk=>clk,
+                cs=>sel(0),
+                ctl_in(7 downto 0)=>data(7 downto 0),
+                ctl_val=>valid,
+                smp_val_in=>smp_clk,
+                smp_out(7 downto 0)=>phase_dat_1(7 downto 0),
+                smp_val_out=>phs_val_1);
+   
+   phase_2 : phase_acc
+      port map (clk=>clk,
+                cs=>sel(1),
+                ctl_in(7 downto 0)=>data(7 downto 0),
+                ctl_val=>valid,
+                smp_val_in=>smp_clk,
+                smp_out(7 downto 0)=>phase_dat_2(7 downto 0),
+                smp_val_out=>phs_val_2);
+   
+   phase_3 : phase_acc
+      port map (clk=>clk,
+                cs=>sel(2),
+                ctl_in(7 downto 0)=>data(7 downto 0),
+                ctl_val=>valid,
+                smp_val_in=>smp_clk,
+                smp_out(7 downto 0)=>phase_dat_3(7 downto 0),
+                smp_val_out=>phs_val_3);
+   
+   phase_4 : phase_acc
+      port map (clk=>clk,
+                cs=>sel(3),
+                ctl_in(7 downto 0)=>data(7 downto 0),
+                ctl_val=>valid,
+                smp_val_in=>smp_clk,
+                smp_out(7 downto 0)=>phase_dat_4(7 downto 0),
+                smp_val_out=>phs_val_4);
+   
+   r_mix : mixer
+      port map (clk=>clk,
+                smp_clk=>smp_clk,
+                smp_in_1(7 downto 0)=>chan_2(7 downto 0),
+                smp_in_2(7 downto 0)=>chan_3(7 downto 0),
+                smp_in_3(7 downto 0)=>chan_4(7 downto 0),
+                smp_val_in_1=>chan_val_2,
+                smp_val_in_2=>chan_val_3,
+                smp_val_in_3=>chan_val_4,
+                smp_out(7 downto 0)=>r_dat(7 downto 0),
+                smp_val_out=>r_val);
+   
+   r_pwm : pwm
+      port map (clk=>clk,
+                smp_in(7 downto 0)=>r_dat(7 downto 0),
+                smp_val_in=>r_val,
+                wave_out=>r_out);
+   
+   slave : spi_slave
       port map (clk=>clk,
                 cs=>cs,
                 sck=>sck,
@@ -115,51 +248,49 @@ begin
                 data(7 downto 0)=>data(7 downto 0),
                 wr=>valid);
    
-   XLXI_3 : lut
+   smp_clock : smp_clkgen
       port map (clk=>clk,
-                cs=>sel(1),
+                smp_clk=>smp_clk);
+   
+   vol_1 : volctl
+      port map (clk=>clk,
+                cs=>sel(8),
                 ctl_in(7 downto 0)=>data(7 downto 0),
                 ctl_val=>valid,
-                smp_in(7 downto 0)=>phase(7 downto 0),
-                smp_val_in=>XLXN_7,
-                smp_out(7 downto 0)=>wave(7 downto 0),
-                smp_val_out=>XLXN_10);
+                smp_in(7 downto 0)=>wave_1(7 downto 0),
+                smp_val_in=>wave_val_1,
+                smp_out(7 downto 0)=>chan_1(7 downto 0),
+                smp_val_out=>chan_val_1);
    
-   XLXI_4 : pwm
+   vol_2 : volctl
       port map (clk=>clk,
-                smp_in(7 downto 0)=>post_amp(7 downto 0),
-                smp_val_in=>XLXN_11,
-                wave_out=>l_out);
-   
-   XLXI_5 : smp_clkgen
-      port map (clk=>clk,
-                smp_clk=>XLXN_4);
-   
-   XLXI_7 : volctl
-      port map (clk=>clk,
-                cs=>sel(2),
+                cs=>sel(9),
                 ctl_in(7 downto 0)=>data(7 downto 0),
                 ctl_val=>valid,
-                smp_in(7 downto 0)=>wave(7 downto 0),
-                smp_val_in=>XLXN_10,
-                smp_out(7 downto 0)=>post_amp(7 downto 0),
-                smp_val_out=>XLXN_11);
+                smp_in(7 downto 0)=>wave_2(7 downto 0),
+                smp_val_in=>wave_val_2,
+                smp_out(7 downto 0)=>chan_2(7 downto 0),
+                smp_val_out=>chan_val_2);
    
-   XLXI_8 : phase_acc
+   vol_3 : volctl
       port map (clk=>clk,
-                cs=>sel(0),
+                cs=>sel(10),
                 ctl_in(7 downto 0)=>data(7 downto 0),
                 ctl_val=>valid,
-                smp_val_in=>XLXN_4,
-                smp_out(7 downto 0)=>phase(7 downto 0),
-                smp_val_out=>XLXN_7);
-
-   led_ctl : leds
-	  port map (clk=>clk,
-			    cs=>sel(3),
-				ctl_in=>data,
-				ctl_val=>valid,
-				leds=>led);
+                smp_in(7 downto 0)=>wave_3(7 downto 0),
+                smp_val_in=>wave_val_3,
+                smp_out(7 downto 0)=>chan_3(7 downto 0),
+                smp_val_out=>chan_val_3);
+   
+   vol_4 : volctl
+      port map (clk=>clk,
+                cs=>sel(11),
+                ctl_in(7 downto 0)=>data(7 downto 0),
+                ctl_val=>valid,
+                smp_in(7 downto 0)=>wave_4(7 downto 0),
+                smp_val_in=>wave_val_4,
+                smp_out(7 downto 0)=>chan_4(7 downto 0),
+                smp_val_out=>chan_val_4);
    
 end BEHAVIORAL;
 
