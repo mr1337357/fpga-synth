@@ -32,7 +32,7 @@ architecture Behavioral of mixer is
 
 begin
    
-   sum <= smp_1+smp_2+smp_3;
+   sum <= ("00"&smp_1)+("00"&smp_2)+("00"&smp_3);
 
    process(clk)
    begin
