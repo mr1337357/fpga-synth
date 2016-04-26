@@ -309,7 +309,7 @@ begin
 
    vol_r_1 : volctl
       port map (clk=>clk,
-                cs=>sel(8),
+                cs=>sel(12),
                 ctl_in(7 downto 0)=>data(7 downto 0),
                 ctl_val=>valid,
                 smp_in(7 downto 0)=>wave_1(7 downto 0),
@@ -319,7 +319,7 @@ begin
 
    vol_r_2 : volctl
       port map (clk=>clk,
-                cs=>sel(9),
+                cs=>sel(13),
                 ctl_in(7 downto 0)=>data(7 downto 0),
                 ctl_val=>valid,
                 smp_in(7 downto 0)=>wave_2(7 downto 0),
@@ -329,7 +329,7 @@ begin
    
    vol_r_3 : volctl
       port map (clk=>clk,
-                cs=>sel(10),
+                cs=>sel(14),
                 ctl_in(7 downto 0)=>data(7 downto 0),
                 ctl_val=>valid,
                 smp_in(7 downto 0)=>wave_3(7 downto 0),
@@ -339,7 +339,7 @@ begin
    
    vol_r_4 : volctl
       port map (clk=>clk,
-                cs=>sel(11),
+                cs=>sel(15),
                 ctl_in(7 downto 0)=>data(7 downto 0),
                 ctl_val=>valid,
                 smp_in(7 downto 0)=>wave_4(7 downto 0),
