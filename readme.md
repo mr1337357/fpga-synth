@@ -28,7 +28,7 @@ Addresses:
 
 * 0-3. Frequency/Phase accumulator - This sets the step size for the phase accumulator. In plain English, this means the frequency of the note to be played. This register contains a MSB-first 16 bit number
 * 4-7. Look Up Table - This is the memory to store the wave. Waves take the form of offset binary signed bytes. There are 256 samples per wave, each 8 bits wide. Offset binary simply means it is a signed number with the most significant bit inverted. 
-* 8-11. Left Volume/Envelope - This sets the volume for the signal to be played. Currently it is a linear function, although I'd like to change this to a scaled logarithmic curve. It takes a one byte unsigned number but it only uses the 5 least significant bits.
+* 8-11. Left Volume/Envelope - This sets the volume for the signal to be played. Currently it is a linear function, although I'd like to change this to a scaled logarithmic curve. It takes a one byte unsigned number.
 * 12-15. Right Volume/Envelope - This is the same as addresses 8 thru 11, only for the other earbud.
 * (disconnected). LEDs - This register isn't necessary. It is just a 16 bit register that shows its stored value on a bank of LEDs.
 
