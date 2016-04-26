@@ -24,13 +24,13 @@ architecture Behavioral of volctl is
 component mult is
    Port (
             a : in STD_LOGIC_VECTOR(7 downto 0);
-            b : in STD_LOGIC_VECTOR(4 downto 0);
+            b : in STD_LOGIC_VECTOR(7 downto 0);
             o : out STD_LOGIC_VECTOR(7 downto 0)
         );
 end component;
 
    Signal smp_sgn : STD_LOGIC_VECTOR(7 downto 0);
-   Signal amp : STD_LOGIC_VECTOR(4 downto 0) := "00100";
+   Signal amp : STD_LOGIC_VECTOR(7 downto 0) := (others => '0');
    Signal mul : STD_LOGIC_VECTOR(7 downto 0);
    Signal output : STD_LOGIC_VECTOR(7 downto 0);
 
@@ -52,7 +52,7 @@ begin
          then
             if(ctl_val = '1')
             then
-               amp <= ctl_in(4 downto 0);
+               amp <= ctl_in(7 downto 0);
             end if;
          end if;
       end if;

@@ -14,14 +14,22 @@ entity synth is
 end synth;
 
 architecture BEHAVIORAL of synth is
-   signal chan_val_1  : std_logic;
-   signal chan_val_2  : std_logic;
-   signal chan_val_3  : std_logic;
-   signal chan_val_4  : std_logic;
-   signal chan_1      : std_logic_vector (7 downto 0);
-   signal chan_2      : std_logic_vector (7 downto 0);
-   signal chan_3      : std_logic_vector (7 downto 0);
-   signal chan_4      : std_logic_vector (7 downto 0);
+   signal chan_val_l_1  : std_logic;
+   signal chan_val_l_2  : std_logic;
+   signal chan_val_l_3  : std_logic;
+   signal chan_val_l_4  : std_logic;
+   signal chan_val_r_1  : std_logic;
+   signal chan_val_r_2  : std_logic;
+   signal chan_val_r_3  : std_logic;
+   signal chan_val_r_4  : std_logic;
+   signal chan_l_1      : std_logic_vector (7 downto 0);
+   signal chan_l_2      : std_logic_vector (7 downto 0);
+   signal chan_l_3      : std_logic_vector (7 downto 0);
+   signal chan_l_4      : std_logic_vector (7 downto 0);
+   signal chan_r_1      : std_logic_vector (7 downto 0);
+   signal chan_r_2      : std_logic_vector (7 downto 0);
+   signal chan_r_3      : std_logic_vector (7 downto 0);
+   signal chan_r_4      : std_logic_vector (7 downto 0);
    signal data        : std_logic_vector (7 downto 0);
    signal l_dat       : std_logic_vector (7 downto 0);
    signal l_val       : std_logic;
@@ -69,11 +77,13 @@ architecture BEHAVIORAL of synth is
       port ( clk          : in    std_logic; 
              smp_val_in_1 : in    std_logic; 
              smp_val_in_2 : in    std_logic; 
-             smp_val_in_3 : in    std_logic; 
+             smp_val_in_3 : in    std_logic;
+             smp_val_in_4 : in    std_logic;
              smp_clk      : in    std_logic; 
              smp_in_1     : in    std_logic_vector (7 downto 0); 
              smp_in_2     : in    std_logic_vector (7 downto 0); 
-             smp_in_3     : in    std_logic_vector (7 downto 0); 
+             smp_in_3     : in    std_logic_vector (7 downto 0);
+             smp_in_4     : in    std_logic_vector (7 downto 0); 
              smp_val_out  : out   std_logic; 
              smp_out      : out   std_logic_vector (7 downto 0));
    end component;
@@ -171,12 +181,14 @@ begin
    l_mix : mixer
       port map (clk=>clk,
                 smp_clk=>smp_clk,
-                smp_in_1(7 downto 0)=>chan_1(7 downto 0),
-                smp_in_2(7 downto 0)=>chan_2(7 downto 0),
-                smp_in_3(7 downto 0)=>chan_3(7 downto 0),
-                smp_val_in_1=>chan_val_1,
-                smp_val_in_2=>chan_val_2,
-                smp_val_in_3=>chan_val_3,
+                smp_in_1(7 downto 0)=>chan_l_1(7 downto 0),
+                smp_in_2(7 downto 0)=>chan_l_2(7 downto 0),
+                smp_in_3(7 downto 0)=>chan_l_3(7 downto 0),
+                smp_in_4(7 downto 0)=>chan_l_4(7 downto 0),
+                smp_val_in_1=>chan_val_l_1,
+                smp_val_in_2=>chan_val_l_2,
+                smp_val_in_3=>chan_val_l_3,
+                smp_val_in_4=>chan_val_l_4,
                 smp_out(7 downto 0)=>l_dat(7 downto 0),
                 smp_val_out=>l_val);
    
@@ -225,12 +237,14 @@ begin
    r_mix : mixer
       port map (clk=>clk,
                 smp_clk=>smp_clk,
-                smp_in_1(7 downto 0)=>chan_2(7 downto 0),
-                smp_in_2(7 downto 0)=>chan_3(7 downto 0),
-                smp_in_3(7 downto 0)=>chan_4(7 downto 0),
-                smp_val_in_1=>chan_val_2,
-                smp_val_in_2=>chan_val_3,
-                smp_val_in_3=>chan_val_4,
+                smp_in_1(7 downto 0)=>chan_r_1(7 downto 0),
+                smp_in_2(7 downto 0)=>chan_r_2(7 downto 0),
+                smp_in_3(7 downto 0)=>chan_r_3(7 downto 0),
+                smp_in_4(7 downto 0)=>chan_r_4(7 downto 0),
+                smp_val_in_1=>chan_val_r_1,
+                smp_val_in_2=>chan_val_r_2,
+                smp_val_in_3=>chan_val_r_3,
+                smp_val_in_4=>chan_val_r_4,
                 smp_out(7 downto 0)=>r_dat(7 downto 0),
                 smp_val_out=>r_val);
    
@@ -252,46 +266,86 @@ begin
       port map (clk=>clk,
                 smp_clk=>smp_clk);
    
-   vol_1 : volctl
+   vol_l_1 : volctl
       port map (clk=>clk,
                 cs=>sel(8),
                 ctl_in(7 downto 0)=>data(7 downto 0),
                 ctl_val=>valid,
                 smp_in(7 downto 0)=>wave_1(7 downto 0),
                 smp_val_in=>wave_val_1,
-                smp_out(7 downto 0)=>chan_1(7 downto 0),
-                smp_val_out=>chan_val_1);
+                smp_out(7 downto 0)=>chan_l_1(7 downto 0),
+                smp_val_out=>chan_val_l_1);
    
-   vol_2 : volctl
+   vol_l_2 : volctl
       port map (clk=>clk,
                 cs=>sel(9),
                 ctl_in(7 downto 0)=>data(7 downto 0),
                 ctl_val=>valid,
                 smp_in(7 downto 0)=>wave_2(7 downto 0),
                 smp_val_in=>wave_val_2,
-                smp_out(7 downto 0)=>chan_2(7 downto 0),
-                smp_val_out=>chan_val_2);
+                smp_out(7 downto 0)=>chan_l_2(7 downto 0),
+                smp_val_out=>chan_val_l_2);
    
-   vol_3 : volctl
+   vol_l_3 : volctl
       port map (clk=>clk,
                 cs=>sel(10),
                 ctl_in(7 downto 0)=>data(7 downto 0),
                 ctl_val=>valid,
                 smp_in(7 downto 0)=>wave_3(7 downto 0),
                 smp_val_in=>wave_val_3,
-                smp_out(7 downto 0)=>chan_3(7 downto 0),
-                smp_val_out=>chan_val_3);
+                smp_out(7 downto 0)=>chan_l_3(7 downto 0),
+                smp_val_out=>chan_val_l_3);
    
-   vol_4 : volctl
+   vol_l_4 : volctl
       port map (clk=>clk,
                 cs=>sel(11),
                 ctl_in(7 downto 0)=>data(7 downto 0),
                 ctl_val=>valid,
                 smp_in(7 downto 0)=>wave_4(7 downto 0),
                 smp_val_in=>wave_val_4,
-                smp_out(7 downto 0)=>chan_4(7 downto 0),
-                smp_val_out=>chan_val_4);
+                smp_out(7 downto 0)=>chan_l_4(7 downto 0),
+                smp_val_out=>chan_val_l_4);
+                
+
+   vol_r_1 : volctl
+      port map (clk=>clk,
+                cs=>sel(8),
+                ctl_in(7 downto 0)=>data(7 downto 0),
+                ctl_val=>valid,
+                smp_in(7 downto 0)=>wave_1(7 downto 0),
+                smp_val_in=>wave_val_1,
+                smp_out(7 downto 0)=>chan_r_1(7 downto 0),
+                smp_val_out=>chan_val_r_1);
+
+   vol_r_2 : volctl
+      port map (clk=>clk,
+                cs=>sel(9),
+                ctl_in(7 downto 0)=>data(7 downto 0),
+                ctl_val=>valid,
+                smp_in(7 downto 0)=>wave_2(7 downto 0),
+                smp_val_in=>wave_val_2,
+                smp_out(7 downto 0)=>chan_r_2(7 downto 0),
+                smp_val_out=>chan_val_r_2);
+   
+   vol_r_3 : volctl
+      port map (clk=>clk,
+                cs=>sel(10),
+                ctl_in(7 downto 0)=>data(7 downto 0),
+                ctl_val=>valid,
+                smp_in(7 downto 0)=>wave_3(7 downto 0),
+                smp_val_in=>wave_val_3,
+                smp_out(7 downto 0)=>chan_r_3(7 downto 0),
+                smp_val_out=>chan_val_r_3);
+   
+   vol_r_4 : volctl
+      port map (clk=>clk,
+                cs=>sel(11),
+                ctl_in(7 downto 0)=>data(7 downto 0),
+                ctl_val=>valid,
+                smp_in(7 downto 0)=>wave_4(7 downto 0),
+                smp_val_in=>wave_val_4,
+                smp_out(7 downto 0)=>chan_r_4(7 downto 0),
+                smp_val_out=>chan_val_r_4);
+
    
 end BEHAVIORAL;
-
-
