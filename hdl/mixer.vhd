@@ -18,6 +18,9 @@ entity mixer is
            --sample input
            smp_in_4 : in STD_LOGIC_VECTOR(7 downto 0);
            smp_val_in_4 : in STD_LOGIC;
+           --sample input
+           smp_in_5 : in STD_LOGIC_VECTOR(7 downto 0);
+           smp_val_in_5 : in STD_LOGIC;
            --sample output
            smp_out : out STD_LOGIC_VECTOR(7 downto 0);
            smp_val_out : out STD_LOGIC;
@@ -32,11 +35,12 @@ architecture Behavioral of mixer is
    Signal smp_2 : STD_LOGIC_VECTOR(7 downto 0);
    Signal smp_3 : STD_LOGIC_VECTOR(7 downto 0);
    Signal smp_4 : STD_LOGIC_VECTOR(7 downto 0);
+   Signal smp_5 : STD_LOGIC_VECTOR(7 downto 0);
    Signal sum : STD_LOGIC_VECTOR(9 downto 0);
 
 begin
    
-   sum <= ("00"&smp_1)+("00"&smp_2)+("00"&smp_3)+("00"&smp_4);
+   sum <= ("00"&smp_1)+("00"&smp_2)+("00"&smp_3)+("00"&smp_4)+("00"&smp_5);
 
    process(clk)
    begin
@@ -80,6 +84,17 @@ begin
             smp_4 <= (not smp_in_4(7)) & smp_in_4(6 downto 0);
          end if;
       end if;
+   end process;
+   
+   process(clk)
+      begin
+         if(clk'event and clk = '1')
+         then
+            if(smp_val_in_5 = '1')
+            then
+               smp_5 <= (not smp_in_5(7)) & smp_in_5(6 downto 0);
+            end if;
+         end if;
    end process;
    
    process(clk)

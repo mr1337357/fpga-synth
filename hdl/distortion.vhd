@@ -3,7 +3,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
-entity volctl is
+entity distortion is
    Port (     
            clk : in STD_LOGIC;
            --sample input
@@ -17,33 +17,20 @@ entity volctl is
            ctl_val : in STD_LOGIC;
            ctl_in : in STD_LOGIC_VECTOR(7 downto 0)
         );
-end volctl;
+end distortion;
 
-architecture Behavioral of volctl is
-
-component mult is
-   Port (
-            a : in STD_LOGIC_VECTOR(7 downto 0);
-            b : in STD_LOGIC_VECTOR(7 downto 0);
-            o : out STD_LOGIC_VECTOR(7 downto 0)
-        );
-end component;
+architecture Behavioral of distortion is
 
    Signal smp_sgn : STD_LOGIC_VECTOR(7 downto 0);
-   Signal amp : STD_LOGIC_VECTOR(7 downto 0);
-   Signal mul : STD_LOGIC_VECTOR(15 downto 0);
+   Signal max : STD_LOGIC_VECTOR(7 downto 0);
+   Signal min : STD_LOGIC_VECTOR(7 downto 0);
    Signal output : STD_LOGIC_VECTOR(7 downto 0);
 
 begin
-   smp_sgn <=(not smp_in(7)) & smp_in(6 downto 0);
---   m1 : mult
---    port map (
---        a => smp_sgn,
---        b => amp,
---        o => mul
---        );
-   mul <= smp_sgn*amp;
-   output <= (not mul(15)) & mul(14 downto 8);
+
+   output <= max when (smp_in > max) else
+             min when (smp_in < min) else
+             smp_in;
 
    process(clk)
    begin
@@ -53,12 +40,9 @@ begin
          then
             if(ctl_val = '1')
             then
-               amp <= ctl_in(7 downto 0);
-            else
-               amp <= amp;
+               max <= x"80"+ctl_in;
+               min <= x"80"-ctl_in;
             end if;
-         else
-            amp <= amp;
          end if;
       end if;
    end process;
