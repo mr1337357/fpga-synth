@@ -13,7 +13,6 @@ entity distortion is
            smp_out : out STD_LOGIC_VECTOR(7 downto 0);
            smp_val_out : out STD_LOGIC;
            --control
-           cs : in STD_LOGIC;
            ctl_val : in STD_LOGIC;
            ctl_in : in STD_LOGIC_VECTOR(7 downto 0)
         );
@@ -36,14 +35,11 @@ begin
    begin
       if(clk'event and clk = '1')
       then
-         if(cs = '0')
-         then
-            if(ctl_val = '1')
-            then
-               max <= x"80"+ctl_in;
-               min <= x"80"-ctl_in;
-            end if;
-         end if;
+        if(ctl_val = '1')
+        then
+           max <= x"80"+ctl_in;
+           min <= x"80"-ctl_in;
+        end if;
       end if;
    end process;
    

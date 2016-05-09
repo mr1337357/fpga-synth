@@ -14,6 +14,18 @@ entity synth is
 end synth;
 
 architecture BEHAVIORAL of synth is
+   signal chan_1 : std_logic_vector(7 downto 0);
+   signal chan_1_valid : std_logic;
+   
+   signal chan_2 : std_logic_vector(7 downto 0);
+   signal chan_2_valid : std_logic;
+
+   signal chan_3 : std_logic_vector(7 downto 0);
+   signal chan_3_valid : std_logic;
+   
+   signal chan_4 : std_logic_vector(7 downto 0);
+   signal chan_4_valid : std_logic;
+   
    signal chan_val_l_1  : std_logic;
    signal chan_val_l_2  : std_logic;
    signal chan_val_l_3  : std_logic;
@@ -30,358 +42,216 @@ architecture BEHAVIORAL of synth is
    signal chan_r_2      : std_logic_vector (7 downto 0);
    signal chan_r_3      : std_logic_vector (7 downto 0);
    signal chan_r_4      : std_logic_vector (7 downto 0);
-   signal perc_phase    : std_logic_vector (7 downto 0);
+   
+   signal perc_phase : std_logic_vector(7 downto 0);
    signal perc_phas_val : std_logic;
    signal perc_sig      : std_logic_vector (7 downto 0);
    signal perc_val      : std_logic;
+   
    signal data        : std_logic_vector (7 downto 0);
    signal l_dat       : std_logic_vector (7 downto 0);
    signal l_val       : std_logic;
-   signal phase_dat_1 : std_logic_vector (7 downto 0);
-   signal phase_dat_2 : std_logic_vector (7 downto 0);
-   signal phase_dat_3 : std_logic_vector (7 downto 0);
-   signal phase_dat_4 : std_logic_vector (7 downto 0);
-   signal phs_val_1   : std_logic;
-   signal phs_val_2   : std_logic;
-   signal phs_val_3   : std_logic;
-   signal phs_val_4   : std_logic;
    signal r_dat       : std_logic_vector (7 downto 0);
    signal r_val       : std_logic;
    signal sel         : std_logic_vector (19 downto 0);
    signal smp_clk     : std_logic;
    signal valid       : std_logic;
-   signal wave_val_1  : std_logic;
-   signal wave_val_2  : std_logic;
-   signal wave_val_3  : std_logic;
-   signal wave_val_4  : std_logic;
-   signal wave_1      : std_logic_vector (7 downto 0);
-   signal wave_2      : std_logic_vector (7 downto 0);
-   signal wave_3      : std_logic_vector (7 downto 0);
-   signal wave_4      : std_logic_vector (7 downto 0);
-   component addr_decode
-      port ( clk   : in    std_logic; 
-             cs    : in    std_logic; 
-             valid : in    std_logic; 
-             data  : in    std_logic_vector (7 downto 0); 
-             sel   : out   std_logic_vector (19 downto 0));
-   end component;
-   
-   component lut
-      port ( clk         : in    std_logic; 
-             smp_val_in  : in    std_logic; 
-             cs          : in    std_logic; 
-             ctl_val     : in    std_logic; 
-             smp_in      : in    std_logic_vector (7 downto 0); 
-             ctl_in      : in    std_logic_vector (7 downto 0); 
-             smp_val_out : out   std_logic; 
-             smp_out     : out   std_logic_vector (7 downto 0));
-   end component;
-   
-   component mixer
-      port ( clk          : in    std_logic; 
-             smp_val_in_1 : in    std_logic; 
-             smp_val_in_2 : in    std_logic; 
-             smp_val_in_3 : in    std_logic;
-             smp_val_in_4 : in    std_logic;
-             smp_val_in_5 : in    std_logic;
-             smp_clk      : in    std_logic; 
-             smp_in_1     : in    std_logic_vector (7 downto 0); 
-             smp_in_2     : in    std_logic_vector (7 downto 0); 
-             smp_in_3     : in    std_logic_vector (7 downto 0);
-             smp_in_4     : in    std_logic_vector (7 downto 0);
-             smp_in_5     : in    std_logic_vector (7 downto 0);
-             smp_val_out  : out   std_logic; 
-             smp_out      : out   std_logic_vector (7 downto 0));
-   end component;
-   
-   component pwm
-      port ( clk        : in    std_logic; 
-             smp_val_in : in    std_logic; 
-             smp_in     : in    std_logic_vector (7 downto 0); 
-             wave_out   : out   std_logic);
-   end component;
-   
-   component phase_acc
-      port ( clk         : in    std_logic; 
-             smp_val_in  : in    std_logic; 
-             cs          : in    std_logic; 
-             ctl_val     : in    std_logic; 
-             ctl_in      : in    std_logic_vector (7 downto 0); 
-             smp_val_out : out   std_logic; 
-             smp_out     : out   std_logic_vector (7 downto 0));
-   end component;
-   
-   component spi_slave
-      port ( clk  : in    std_logic; 
-             sck  : in    std_logic; 
-             sdi  : in    std_logic; 
-             cs   : in    std_logic; 
-             wr   : out   std_logic; 
-             data : out   std_logic_vector (7 downto 0));
-   end component;
-   
-   component smp_clkgen
-      port ( clk     : in    std_logic; 
-             smp_clk : out   std_logic);
-   end component;
-   
-   component volctl
-      port ( clk         : in    std_logic; 
-             smp_val_in  : in    std_logic; 
-             cs          : in    std_logic; 
-             ctl_val     : in    std_logic; 
-             smp_in      : in    std_logic_vector (7 downto 0); 
-             ctl_in      : in    std_logic_vector (7 downto 0); 
-             smp_val_out : out   std_logic; 
-             smp_out     : out   std_logic_vector (7 downto 0));
-   end component;
-   
-   component oneshot_phaser
-      port ( clk         : in    std_logic; 
-             smp_val_in  : in    std_logic; 
-             cs          : in    std_logic; 
-             ctl_val     : in    std_logic; 
-             ctl_in      : in    std_logic_vector (7 downto 0); 
-             smp_val_out : out   std_logic; 
-             smp_out     : out   std_logic_vector (7 downto 0));
-   end component;
    
 begin
-   decoder : addr_decode
+-- SPI SLAVE AND ADDRESS DECODER
+   slave : entity work.spi_slave
       port map (clk=>clk,
                 cs=>cs,
-                data(7 downto 0)=>data(7 downto 0),
+                sck=>sck,
+                sdi=>sdi,
+                data=>data,
+                wr=>valid);
+
+   decoder : entity work.addr_decode
+      port map (clk=>clk,
+                cs=>cs,
+                data=>data,
                 valid=>valid,
-                sel(19 downto 0)=>sel(19 downto 0));
-   
-   lut_1 : lut
-      port map (clk=>clk,
-                cs=>sel(4),
-                ctl_in(7 downto 0)=>data(7 downto 0),
-                ctl_val=>valid,
-                smp_in(7 downto 0)=>phase_dat_1(7 downto 0),
-                smp_val_in=>phs_val_1,
-                smp_out(7 downto 0)=>wave_1(7 downto 0),
-                smp_val_out=>wave_val_1);
-   
-   lut_2 : lut
-      port map (clk=>clk,
-                cs=>sel(5),
-                ctl_in(7 downto 0)=>data(7 downto 0),
-                ctl_val=>valid,
-                smp_in(7 downto 0)=>phase_dat_2(7 downto 0),
-                smp_val_in=>phs_val_2,
-                smp_out(7 downto 0)=>wave_2(7 downto 0),
-                smp_val_out=>wave_val_2);
-   
-   lut_3 : lut
-      port map (clk=>clk,
-                cs=>sel(6),
-                ctl_in(7 downto 0)=>data(7 downto 0),
-                ctl_val=>valid,
-                smp_in(7 downto 0)=>phase_dat_3(7 downto 0),
-                smp_val_in=>phs_val_3,
-                smp_out(7 downto 0)=>wave_3(7 downto 0),
-                smp_val_out=>wave_val_3);
-   
-   lut_4 : lut
-      port map (clk=>clk,
-                cs=>sel(7),
-                ctl_in(7 downto 0)=>data(7 downto 0),
-                ctl_val=>valid,
-                smp_in(7 downto 0)=>phase_dat_4(7 downto 0),
-                smp_val_in=>phs_val_4,
-                smp_out(7 downto 0)=>wave_4(7 downto 0),
-                smp_val_out=>wave_val_4);
-   
-   l_mix : mixer
+                sel=>sel);
+
+-- SAMPLE CLOCK
+    smp_clock : entity work.smp_clkgen
+        port map (clk=>clk,
+                  smp_clk=>smp_clk);
+
+    channel1 : entity work.channel
+    port map ( clk => clk,
+               cfgdata => data,
+               cfg_valid => valid,
+               notesel => sel(0),
+               wavesel => sel(4),
+               envsel => sel(8),
+               smpclk => smp_clk,
+               wave_out => chan_1,
+               wave_out_val => chan_1_valid
+    );
+
+    channel2 : entity work.channel
+    port map ( clk => clk,
+               cfgdata => data,
+               cfg_valid => valid,
+               notesel => sel(1),
+               wavesel => sel(5),
+               envsel => sel(9),
+               smpclk => smp_clk,
+               wave_out => chan_2,
+               wave_out_val => chan_2_valid
+    );
+
+    channel3 : entity work.channel
+    port map ( clk => clk,
+               cfgdata => data,
+               cfg_valid => valid,
+               notesel => sel(2),
+               wavesel => sel(6),
+               envsel => sel(10),
+               smpclk => smp_clk,
+               wave_out => chan_3,
+               wave_out_val => chan_3_valid
+    );
+    
+    channel4 : entity work.channel
+    port map ( clk => clk,
+               cfgdata => data,
+               cfg_valid => valid,
+               notesel => sel(3),
+               wavesel => sel(7),
+               envsel => sel(11),
+               smpclk => smp_clk,
+               wave_out => chan_4,
+               wave_out_val => chan_4_valid
+    );
+
+   l_mix : entity work.mixer
       port map (clk=>clk,
                 smp_clk=>smp_clk,
-                smp_in_1(7 downto 0)=>chan_l_1(7 downto 0),
-                smp_in_2(7 downto 0)=>chan_l_2(7 downto 0),
-                smp_in_3(7 downto 0)=>chan_l_3(7 downto 0),
-                smp_in_4(7 downto 0)=>chan_l_4(7 downto 0),
-                smp_in_5(7 downto 0)=>perc_sig,
+                smp_in_1=>chan_l_1,
+                smp_in_2=>chan_l_2,
+                smp_in_3=>chan_l_3,
+                smp_in_4=>chan_l_4,
+                smp_in_5=>perc_sig,
                 smp_val_in_1=>chan_val_l_1,
                 smp_val_in_2=>chan_val_l_2,
                 smp_val_in_3=>chan_val_l_3,
                 smp_val_in_4=>chan_val_l_4,
                 smp_val_in_5=>perc_val,
-                smp_out(7 downto 0)=>l_dat(7 downto 0),
+                smp_out=>l_dat,
                 smp_val_out=>l_val);
    
-   l_pwm : pwm
+   l_pwm : entity work.pwm
       port map (clk=>clk,
-                smp_in(7 downto 0)=>l_dat(7 downto 0),
+                smp_in=>l_dat,
                 smp_val_in=>l_val,
                 wave_out=>l_out);
-   
-   phase_1 : phase_acc
-      port map (clk=>clk,
-                cs=>sel(0),
-                ctl_in(7 downto 0)=>data(7 downto 0),
-                ctl_val=>valid,
-                smp_val_in=>smp_clk,
-                smp_out(7 downto 0)=>phase_dat_1(7 downto 0),
-                smp_val_out=>phs_val_1);
-   
-   phase_2 : phase_acc
-      port map (clk=>clk,
-                cs=>sel(1),
-                ctl_in(7 downto 0)=>data(7 downto 0),
-                ctl_val=>valid,
-                smp_val_in=>smp_clk,
-                smp_out(7 downto 0)=>phase_dat_2(7 downto 0),
-                smp_val_out=>phs_val_2);
-   
-   phase_3 : phase_acc
-      port map (clk=>clk,
-                cs=>sel(2),
-                ctl_in(7 downto 0)=>data(7 downto 0),
-                ctl_val=>valid,
-                smp_val_in=>smp_clk,
-                smp_out(7 downto 0)=>phase_dat_3(7 downto 0),
-                smp_val_out=>phs_val_3);
-   
-   phase_4 : phase_acc
-      port map (clk=>clk,
-                cs=>sel(3),
-                ctl_in(7 downto 0)=>data(7 downto 0),
-                ctl_val=>valid,
-                smp_val_in=>smp_clk,
-                smp_out(7 downto 0)=>phase_dat_4(7 downto 0),
-                smp_val_out=>phs_val_4);
-   
-   r_mix : mixer
+
+   r_mix : entity work.mixer
       port map (clk=>clk,
                 smp_clk=>smp_clk,
-                smp_in_1(7 downto 0)=>chan_r_1(7 downto 0),
-                smp_in_2(7 downto 0)=>chan_r_2(7 downto 0),
-                smp_in_3(7 downto 0)=>chan_r_3(7 downto 0),
-                smp_in_4(7 downto 0)=>chan_r_4(7 downto 0),
-                smp_in_5(7 downto 0)=>perc_sig,
+                smp_in_1=>chan_r_1,
+                smp_in_2=>chan_r_2,
+                smp_in_3=>chan_r_3,
+                smp_in_4=>chan_r_4,
+                smp_in_5=>perc_sig,
                 smp_val_in_1=>chan_val_r_1,
                 smp_val_in_2=>chan_val_r_2,
                 smp_val_in_3=>chan_val_r_3,
                 smp_val_in_4=>chan_val_r_4,
                 smp_val_in_5=>perc_val,
-                smp_out(7 downto 0)=>r_dat(7 downto 0),
+                smp_out=>r_dat,
                 smp_val_out=>r_val);
    
-   r_pwm : pwm
+   r_pwm : entity work.pwm
       port map (clk=>clk,
-                smp_in(7 downto 0)=>r_dat(7 downto 0),
+                smp_in=>r_dat,
                 smp_val_in=>r_val,
-                wave_out=>r_out);
+                wave_out=>r_out);				
+
    
-   slave : spi_slave
+   vol_l_1 : entity work.volctl
       port map (clk=>clk,
-                cs=>cs,
-                sck=>sck,
-                sdi=>sdi,
-                data(7 downto 0)=>data(7 downto 0),
-                wr=>valid);
-   
-   smp_clock : smp_clkgen
-      port map (clk=>clk,
-                smp_clk=>smp_clk);
-   
-   vol_l_1 : volctl
-      port map (clk=>clk,
-                cs=>sel(8),
-                ctl_in(7 downto 0)=>data(7 downto 0),
+                cs=>sel(12),
+                ctl_in=>data,
                 ctl_val=>valid,
-                smp_in(7 downto 0)=>wave_1(7 downto 0),
-                smp_val_in=>wave_val_1,
-                smp_out(7 downto 0)=>chan_l_1(7 downto 0),
+                smp_in=>chan_1,
+                smp_val_in=>chan_1_valid,
+                smp_out=>chan_l_1,
                 smp_val_out=>chan_val_l_1);
    
-   vol_l_2 : volctl
+   vol_l_2 : entity work.volctl
       port map (clk=>clk,
-                cs=>sel(9),
-                ctl_in(7 downto 0)=>data(7 downto 0),
+                cs=>sel(13),
+                ctl_in=>data,
                 ctl_val=>valid,
-                smp_in(7 downto 0)=>wave_2(7 downto 0),
-                smp_val_in=>wave_val_2,
-                smp_out(7 downto 0)=>chan_l_2(7 downto 0),
+                smp_in=>chan_2,
+                smp_val_in=>chan_2_valid,
+                smp_out=>chan_l_2,
                 smp_val_out=>chan_val_l_2);
    
-   vol_l_3 : volctl
+   vol_l_3 : entity work.volctl
       port map (clk=>clk,
-                cs=>sel(10),
-                ctl_in(7 downto 0)=>data(7 downto 0),
+                cs=>sel(14),
+                ctl_in=>data,
                 ctl_val=>valid,
-                smp_in(7 downto 0)=>wave_3(7 downto 0),
-                smp_val_in=>wave_val_3,
-                smp_out(7 downto 0)=>chan_l_3(7 downto 0),
+                smp_in=>chan_3,
+                smp_val_in=>chan_3_valid,
+                smp_out=>chan_l_3,
                 smp_val_out=>chan_val_l_3);
    
-   vol_l_4 : volctl
+   vol_l_4 : entity work.volctl
       port map (clk=>clk,
-                cs=>sel(11),
-                ctl_in(7 downto 0)=>data(7 downto 0),
+                cs=>sel(15),
+                ctl_in=>data,
                 ctl_val=>valid,
-                smp_in(7 downto 0)=>wave_4(7 downto 0),
-                smp_val_in=>wave_val_4,
-                smp_out(7 downto 0)=>chan_l_4(7 downto 0),
+                smp_in=>chan_4,
+                smp_val_in=>chan_4_valid,
+                smp_out=>chan_l_4,
                 smp_val_out=>chan_val_l_4);
                 
 
-   vol_r_1 : volctl
-      port map (clk=>clk,
-                cs=>sel(12),
-                ctl_in(7 downto 0)=>data(7 downto 0),
-                ctl_val=>valid,
-                smp_in(7 downto 0)=>wave_1(7 downto 0),
-                smp_val_in=>wave_val_1,
-                smp_out(7 downto 0)=>chan_r_1(7 downto 0),
-                smp_val_out=>chan_val_r_1);
-
-   vol_r_2 : volctl
-      port map (clk=>clk,
-                cs=>sel(13),
-                ctl_in(7 downto 0)=>data(7 downto 0),
-                ctl_val=>valid,
-                smp_in(7 downto 0)=>wave_2(7 downto 0),
-                smp_val_in=>wave_val_2,
-                smp_out(7 downto 0)=>chan_r_2(7 downto 0),
-                smp_val_out=>chan_val_r_2);
-   
-   vol_r_3 : volctl
-      port map (clk=>clk,
-                cs=>sel(14),
-                ctl_in(7 downto 0)=>data(7 downto 0),
-                ctl_val=>valid,
-                smp_in(7 downto 0)=>wave_3(7 downto 0),
-                smp_val_in=>wave_val_3,
-                smp_out(7 downto 0)=>chan_r_3(7 downto 0),
-                smp_val_out=>chan_val_r_3);
-   
-   vol_r_4 : volctl
-      port map (clk=>clk,
-                cs=>sel(15),
-                ctl_in(7 downto 0)=>data(7 downto 0),
-                ctl_val=>valid,
-                smp_in(7 downto 0)=>wave_4(7 downto 0),
-                smp_val_in=>wave_val_4,
-                smp_out(7 downto 0)=>chan_r_4(7 downto 0),
-                smp_val_out=>chan_val_r_4);
-   drum_phase : oneshot_phaser
+   vol_r_1 : entity work.volctl
       port map (clk=>clk,
                 cs=>sel(16),
-                ctl_in(7 downto 0)=>data(7 downto 0),
+                ctl_in=>data,
                 ctl_val=>valid,
-                smp_val_in=>smp_clk,
-                smp_out(7 downto 0)=>perc_phase(7 downto 0),
-                smp_val_out=>perc_phas_val);
-   drum_smp : lut
+                smp_in=>chan_1,
+                smp_val_in=>chan_1_valid,
+                smp_out=>chan_r_1,
+                smp_val_out=>chan_val_r_1);
+
+   vol_r_2 : entity work.volctl
       port map (clk=>clk,
                 cs=>sel(17),
-                ctl_in(7 downto 0)=>data(7 downto 0),
+                ctl_in=>data,
                 ctl_val=>valid,
-                smp_in(7 downto 0)=>perc_phase,
-                smp_val_in=>perc_phas_val,
-                smp_out(7 downto 0)=>perc_sig,
-                smp_val_out=>perc_val);
+                smp_in=>chan_2,
+                smp_val_in=>chan_2_valid,
+                smp_out=>chan_r_2,
+                smp_val_out=>chan_val_r_2);
+   
+   vol_r_3 : entity work.volctl
+      port map (clk=>clk,
+                cs=>sel(18),
+                ctl_in=>data,
+                ctl_val=>valid,
+                smp_in=>chan_3,
+                smp_val_in=>chan_3_valid,
+                smp_out=>chan_r_3,
+                smp_val_out=>chan_val_r_3);
+   
+   vol_r_4 : entity work.volctl
+      port map (clk=>clk,
+                cs=>sel(19),
+                ctl_in=>data,
+                ctl_val=>valid,
+                smp_in=>chan_4,
+                smp_val_in=>chan_4_valid,
+                smp_out=>chan_r_4,
+                smp_val_out=>chan_val_r_4);
+
    
 end BEHAVIORAL;

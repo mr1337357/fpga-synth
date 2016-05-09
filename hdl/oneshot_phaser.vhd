@@ -11,16 +11,14 @@ entity oneshot_phaser is
            smp_out : out STD_LOGIC_VECTOR(7 downto 0);
            smp_val_out : out STD_LOGIC;
               --control
-           cs : in STD_LOGIC;
            ctl_val : in STD_LOGIC;
-           ctl_in : in STD_LOGIC_VECTOR(7 downto 0)
+           ctl_in : in STD_LOGIC_VECTOR(15 downto 0)
         );
 end oneshot_phaser;
 
 architecture Behavioral of oneshot_phaser is
    Signal int_phase : STD_LOGIC_VECTOR(16 downto 0) := (others => '0');
    Signal int_freq : STD_LOGIC_VECTOR(15 downto 0) := (others => '0');
-   Signal freq_state : STD_LOGIC := '0';
    Signal freq_temp : STD_LOGIC_VECTOR(7 downto 0) := "00000000";
 begin
    smp_out <= int_phase(15 downto 8);
@@ -31,18 +29,10 @@ begin
    begin
       if(clk'event and clk = '1')
       then
-         if(cs = '0')
+         if(ctl_val = '1')
          then
-            if(ctl_val = '1' and freq_state = '0')
-            then
-               freq_state <= '1';
-               freq_temp <= ctl_in;
-            end if;
-            if(ctl_val = '1' and freq_state = '1')
-            then
-               int_freq <=freq_temp & ctl_in;
-               int_phase <= (others => '0');
-            end if;
+            int_freq <= ctl_in;
+            int_phase <= (others => '0');
          elsif(smp_val_in = '1')
          then
             if(int_phase(16)='0')
@@ -52,7 +42,6 @@ begin
             smp_val_out <= '1';
          else
             smp_val_out <= '0';
-            freq_state <= '0';
          end if;
       end if;
    end process;

@@ -11,9 +11,8 @@ entity phase_acc is
            smp_out : out STD_LOGIC_VECTOR(7 downto 0);
            smp_val_out : out STD_LOGIC;
               --control
-           cs : in STD_LOGIC;
            ctl_val : in STD_LOGIC;
-           ctl_in : in STD_LOGIC_VECTOR(7 downto 0)
+           ctl_in : in STD_LOGIC_VECTOR(15 downto 0)
         );
 end phase_acc;
 
@@ -43,20 +42,10 @@ begin
    begin
       if(clk'event and clk = '1')
       then
-         if(cs = '0')
-         then
-            if(ctl_val = '1' and freq_state = '0')
-            then
-               freq_state <= '1';
-               freq_temp <= ctl_in;
-            end if;
-            if(ctl_val = '1' and freq_state = '1')
-            then
-               int_freq <=freq_temp & ctl_in;
-            end if;
-         else
-            freq_state <= '0';
-         end if;
+        if(ctl_val = '1')
+        then
+           int_freq <= ctl_in;
+        end if;
       end if;
    end process;
 
