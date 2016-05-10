@@ -38,6 +38,9 @@ architecture Behavioral of channel is
     
     signal fuzzed : std_logic_vector(7 downto 0);
     signal fuzzed_valid : std_logic;
+    
+    signal ampd : std_logic_vector(7 downto 0);
+    signal ampd_valid : std_logic;
 
 begin
 
@@ -133,7 +136,19 @@ begin
         ctl_in => configdata(15 downto 8)
     );
     
-    wave_out <= fuzzed;
-    wave_out_val <= fuzzed_valid;
+    volume : entity work.volctl
+        port map(
+            clk => clk,
+            smp_in => fuzzed,
+            smp_val_in => fuzzed_valid,
+            smp_out => ampd,
+            smp_val_out => ampd_valid,
+            cs => '0',
+            ctl_val => loadnote,
+            ctl_in => configdata(7 downto 0)
+    );
+    
+    wave_out <= ampd;
+    wave_out_val <= ampd_valid;
 
 end Behavioral;

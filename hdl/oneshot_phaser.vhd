@@ -17,11 +17,10 @@ entity oneshot_phaser is
 end oneshot_phaser;
 
 architecture Behavioral of oneshot_phaser is
-   Signal int_phase : STD_LOGIC_VECTOR(16 downto 0) := (others => '0');
+   Signal int_phase : STD_LOGIC_VECTOR(20 downto 0) := (others => '0');
    Signal int_freq : STD_LOGIC_VECTOR(15 downto 0) := (others => '0');
-   Signal freq_temp : STD_LOGIC_VECTOR(7 downto 0) := "00000000";
 begin
-   smp_out <= int_phase(15 downto 8);
+   smp_out <= int_phase(19 downto 12);
 
 
 
@@ -35,9 +34,11 @@ begin
             int_phase <= (others => '0');
          elsif(smp_val_in = '1')
          then
-            if(int_phase(16)='0')
+            if(int_phase(20)='0')
             then
                 int_phase <= int_phase + ('0' & int_freq);
+            else
+                int_phase <= (others => '1');
             end if;
             smp_val_out <= '1';
          else

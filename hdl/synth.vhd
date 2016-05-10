@@ -43,8 +43,6 @@ architecture BEHAVIORAL of synth is
    signal chan_r_3      : std_logic_vector (7 downto 0);
    signal chan_r_4      : std_logic_vector (7 downto 0);
    
-   signal perc_phase : std_logic_vector(7 downto 0);
-   signal perc_phas_val : std_logic;
    signal perc_sig      : std_logic_vector (7 downto 0);
    signal perc_val      : std_logic;
    
@@ -53,7 +51,7 @@ architecture BEHAVIORAL of synth is
    signal l_val       : std_logic;
    signal r_dat       : std_logic_vector (7 downto 0);
    signal r_val       : std_logic;
-   signal sel         : std_logic_vector (19 downto 0);
+   signal sel         : std_logic_vector (31 downto 0);
    signal smp_clk     : std_logic;
    signal valid       : std_logic;
    
@@ -252,6 +250,16 @@ begin
                 smp_val_in=>chan_4_valid,
                 smp_out=>chan_r_4,
                 smp_val_out=>chan_val_r_4);
+
+    perc : entity work.drum
+        Port map ( clk => clk,
+               cfgdata => data,
+               smp_clk => smp_clk,
+               load => valid,
+               cs => sel(20),
+               sample => perc_sig,
+               sample_valid => perc_val
+           );
 
    
 end BEHAVIORAL;
