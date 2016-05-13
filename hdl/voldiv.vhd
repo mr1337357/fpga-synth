@@ -1,7 +1,7 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
-use IEEE.NUMERIC_STD.ALL;
+--use IEEE.NUMERIC_STD.ALL;
 
 entity volctl is
    Port (     
@@ -31,19 +31,19 @@ end component;
 
    Signal smp_sgn : STD_LOGIC_VECTOR(7 downto 0);
    Signal amp : STD_LOGIC_VECTOR(7 downto 0);
-   Signal mul : STD_LOGIC_VECTOR(15 downto 0);
+   Signal mul : STD_LOGIC_VECTOR(7 downto 0);
    Signal output : STD_LOGIC_VECTOR(7 downto 0);
 
 begin
-   smp_sgn <=(not smp_in(7)) & smp_in(6 downto 0);
---   m1 : mult
---    port map (
---        a => smp_sgn,
---        b => amp,
---        o => mul
---        );
-   mul <= smp_sgn*amp;
-   output <= (not mul(15)) & mul(14 downto 8);
+   smp_sgn <= smp_in xor "10000000";
+   m1 : mult
+    port map (
+        a => smp_sgn,
+        b => amp,
+        o => mul
+        );
+   output <= mul xor "10000000";-- when smp_sgn(7) = '0' else
+            --("00000000"-mul) xor "10000000";--(not mul(7)) & mul(6 downto 0);
 
    process(clk)
    begin
@@ -53,7 +53,7 @@ begin
          then
             if(ctl_val = '1')
             then
-               amp <= ctl_in(7 downto 0);
+               amp <= ctl_in;
             else
                amp <= amp;
             end if;

@@ -125,16 +125,16 @@ begin
         ctl_in => env_value
     );
     
-    fuzzer : entity work.distortion
-    port map(
-        clk => clk,
-        smp_in => enveloped,
-        smp_val_in => enveloped_valid,
-        smp_out => fuzzed,
-        smp_val_out => fuzzed_valid,
-        ctl_val => loadnote,
-        ctl_in => configdata(15 downto 8)
-    );
+--    fuzzer : entity work.distortion
+--    port map(
+--        clk => clk,
+--        smp_in => enveloped,
+--        smp_val_in => enveloped_valid,
+--        smp_out => fuzzed,
+--        smp_val_out => fuzzed_valid,
+--        ctl_val => loadnote,
+--        ctl_in => configdata(15 downto 8)
+--    );
     
     volume : entity work.volctl
         port map(
@@ -148,6 +148,8 @@ begin
             ctl_in => configdata(7 downto 0)
     );
     
+    fuzzed <= enveloped;
+    fuzzed_valid <= enveloped_valid;
     wave_out <= ampd;
     wave_out_val <= ampd_valid;
 

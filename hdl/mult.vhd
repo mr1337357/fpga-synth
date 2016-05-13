@@ -12,6 +12,9 @@ entity mult is
 end mult;
 
 architecture Behavioral of mult is
+
+	signal neg : STD_LOGIC;
+	signal abs_a : STD_LOGIC_VECTOR(7 downto 0);
    
    signal shift0 : STD_LOGIC_VECTOR(15 downto 0);
    signal shift1 : STD_LOGIC_VECTOR(15 downto 0);
@@ -29,18 +32,22 @@ architecture Behavioral of mult is
    signal mul4 : STD_LOGIC_VECTOR(15 downto 0);
    signal mul5 : STD_LOGIC_VECTOR(15 downto 0);
    signal mul6 : STD_LOGIC_VECTOR(15 downto 0);
-   signal mul7 : STD_LOGIC_VECTOR(15 downto 0);
+   signal mul7 : STD_LOGIC_VECTOR(16 downto 0); 
 
 begin
+	neg <= a(7);
+	abs_a <= "01111111" when a = "100000000" else
+				"00000000" - a when neg = '1' else
+				a;
 
-   shift0 <= "00000000" & a;
-   shift1 <= "0000000" & a & "0";
-   shift2 <= "000000" & a & "00";
-   shift3 <= "00000" & a & "000";
-   shift4 <= "0000" & a & "0000";
-   shift5 <= "000" & a & "00000";
-   shift6 <= "00" & a & "000000";
-   shift7 <= "0" & a & "0000000";
+   shift0 <= "00000000" & abs_a;
+   shift1 <= "0000000" & abs_a & "0";
+   shift2 <= "000000" & abs_a & "00";
+   shift3 <= "00000" & abs_a & "000";
+   shift4 <= "0000" & abs_a & "0000";
+   shift5 <= "000" & abs_a & "00000";
+   shift6 <= "00" & abs_a & "000000";
+   shift7 <= "0" & abs_a & "0000000";
 
    mul0 <= shift0 when b(0) = '1' else
            (others => '0');
@@ -56,9 +63,10 @@ begin
            mul4;
    mul6 <= shift6 + mul5 when b(6) = '1' else
            mul5;
-   mul7 <= shift7 + mul6 when b(7) = '1' else
-           mul6;
+   mul7 <= ('0' & shift7) + ('0' & mul6) when b(7) = '1' else
+           '0' & mul6;
 
-   o <= mul7(15 downto 8);
+   o <= "00000000" - mul7(16 downto 9) when neg = '1' else
+		  mul7(16 downto 9);
 
 end Behavioral;

@@ -3,7 +3,8 @@
 #include "notes.h"
 #include "song.h"
 
-#define CS P2_0
+#define CS 2
+#define RED_LED 13
 
 #define CHAN1 0
 #define CHAN2 1
@@ -41,6 +42,18 @@ void send_message(byte addr,const byte *message,int len)
   while(len--)
   {
     SPI.transfer(*message++);
+  }
+  digitalWrite(CS,HIGH);
+}
+
+void set_ramp(byte chan)
+{
+  int i;
+  digitalWrite(CS,LOW);
+  SPI.transfer(chan+WAVE_OFFSET);
+  for(i=0;i<256;i++)
+  {
+    SPI.transfer(255-i);
   }
   digitalWrite(CS,HIGH);
 }
@@ -118,37 +131,79 @@ void setup()
   pinMode(RED_LED,OUTPUT);
   digitalWrite(RED_LED,HIGH);
   SPI.begin();
+  SPI.setMOSI(7);
+  SPI.setSCK(14);
   SPI.setDataMode(SPI_MODE2);
   pinMode(CS,OUTPUT);
   digitalWrite(CS,HIGH);
   set_tone(CHAN1,sine);
+  //set_ramp(CHAN1);
   set_tone(CHAN2,sine);
   set_tone(CHAN3,sine);
-  set_tone(CHAN4,square);
+  //set_tone(CHAN4,square);
+  set_tone(CHAN4,badsin);
+  //set_badsin(CHAN4);
   //set_env(CHAN1, fade);
   vocal_env(CHAN1);
   set_env(CHAN2, fade);
-  set_env(CHAN3, square);
-  set_env(CHAN4, square);
-  set_byte(VOL1L,128);
+  set_env(CHAN3, fade);
+  //set_env(CHAN4, fade);
+  vocal_env(CHAN4);
+  set_byte(VOL1L,64);
   set_byte(VOL1R,255);
-  set_byte(VOL2L,255);
-  set_byte(VOL2R,128);
-  set_byte(VOL3L,255);
-  set_byte(VOL3R,255);
-  digitalWrite(RED_LED,LOW);
-  //send_note(CHAN1,220,5,0x7F,0xFF);
+  set_byte(VOL2L,192);
+  set_byte(VOL2R,64);
+  set_byte(VOL3L,128);
+  set_byte(VOL3R,128);
+  set_byte(VOL4L,96);
+  set_byte(VOL4R,96);
+  digitalWrite(RED_LED,HIGH);
   //send_note(CHAN2,330,5,0x7F,0xFF);
   //send_note(CHAN4,660,8,0x7F);
-  play_drum(256,255);
 }
 
 unsigned short i=0;
+int wait1 = 0;
+int wait2 = 0;
+int wait3 = 0;
+int wait4 = 0;
+
 void loop()
 {
-  send_note(CHAN1,c1[i].freq,c1[i].len,c1[i].fuzz,c1[i].vol);
-  send_note(CHAN2,c2[i].freq,c2[i].len,c2[i].fuzz,c2[i].vol);
-  send_note(CHAN3,c3[i].freq,c3[i].len,c3[i].fuzz,c3[i].vol);
+  wait1--;
+  if(wait1<1||c1[i].freq)
+  {
+    wait1 = 0;
+    unsigned short l = 0x60/c1[i].len;
+    send_note(CHAN1,c1[i].freq,l,0x7F,c1[i].vol*2);
+    wait1 = c1[i].len;
+  }
+  wait2--;
+  if(wait2<1||c2[i].freq)
+  {
+    wait2 = 0;
+    unsigned short l = 0x80/c2[i].len;
+    send_note(CHAN2,c2[i].freq,0x10,0x7F,c2[i].vol*3);
+    wait2 = c2[i].len;
+  }
+  wait3--;
+  if(wait3<1||c3[i].freq)
+  {
+    wait3 = 0;
+    unsigned short l = 0x80/c3[i].len;
+    send_note(CHAN3,c3[i].freq,0x20,0x60,c3[i].vol*3);
+    wait3 = c3[i].len;
+  }
+  wait4--;
+  if(wait4<1||c4[i].freq)
+  {
+    wait4 = 0;
+    unsigned short l = 0x80/c4[i].len;
+    send_note(CHAN4,c4[i].freq,0x40,0x7F,c4[i].vol*3);
+    wait4 = c4[i].len;
+  }
+  //send_note(CHAN2,c2[i].freq,c2[i].len,c2[i].fuzz,c2[i].vol);
+  //send_note(CHAN3,c3[i].freq,c3[i].len,c3[i].fuzz,c3[i].vol);
   delay(250);
   i++;
   while(i==700);
